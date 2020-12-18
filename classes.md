@@ -6,13 +6,9 @@ Contains entry method of the whole program, creates InteractionService for Conso
 
 Contains and generates shared text resources with ConsoleRenderer and TelnetRenderer. For ConsoleRenderer, returns menu with "start service entry" and for TelnetRenderer returns menu with one-screen or online types of game.
 
-# ConsoleRenderer : Renderer
+# StreamRenderer : Renderer
 
-Implementation for local terminal game interaction. Calls TextRenderService to generate game frontend from game values.
-
-# TelnetRenderer : Renderer
-
-Implementation for online game interaction through telnet, each one for each connected player. Calls TextRenderService to generate game frontend from game values.
+Implementation for text-mode game rendering. Can be used for local console rendering or any stream/terminal rendering. Calls TextRenderService to generate game frontend from game values.
 
 # Renderer
 
