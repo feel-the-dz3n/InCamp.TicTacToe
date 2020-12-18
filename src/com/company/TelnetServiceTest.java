@@ -50,7 +50,7 @@ class TelnetServiceTest {
         // Player 1 is supposed to be removed from the 'room1/2'
         // 'room1/2' is supposed to be removed from TelnetService at all
         // Two other players are supposed to innocently keep
-        // playing in the 'room3/4' like nothing happened...
+        // playing in 'room3/4' like nothing happened...
         assertEquals(1, svc.getRoomsCount()); // only one room left
 
         assertNull(svc.getRemotePlayerRoom(player1)); // player 1 is not any room
