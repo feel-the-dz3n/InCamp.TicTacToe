@@ -8,6 +8,7 @@ public class GameService {
     private Player currentTurn;
     private PlayField playField;
     private PlayFieldService fieldService;
+    private GameRoom room;
 
     public GameService() {
         fieldService = new PlayFieldService();
@@ -72,6 +73,14 @@ public class GameService {
 
         if (currentTurn == Player.X) currentTurn = Player.O;
         else currentTurn = Player.X;
+    }
+
+    public boolean isOnline() {
+        return room != null;
+    }
+
+    public GameRoom getRoom() {
+        return room;
     }
 
     // Do a turn as current player.
