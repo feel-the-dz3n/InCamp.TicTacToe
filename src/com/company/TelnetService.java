@@ -61,15 +61,19 @@ public class TelnetService extends Thread {
             Socket client = serverSocket.accept();
 
             // We got one, now let's get in/out buffers
-            var inputStream= client.getInputStream();
+            var inputStream = client.getInputStream();
             var outStream = client.getOutputStream();
 
             // Current thread will keep waiting for new connections
             // Creating a new thread for interaction with client
             Thread interactionThread = new Thread(() -> {
+
                 // Creating a new RemotePlayer instance
                 var remotePlayer = new RemotePlayer(client);
-                clients.add(remotePlayer);
+
+                synchronized (clients) {
+                    clients.add(remotePlayer);
+                }
 
                 // Creating InteractionService
                 var interaction = new InteractionService(
@@ -115,9 +119,11 @@ public class TelnetService extends Thread {
     // Returns GameRoom if player joined any or
     // returns null if player didn't join any room
     public GameRoom getRemotePlayerRoom(RemotePlayer player) {
-        for (var room : rooms)
-            if (room.isPlayerJoined(player))
-                return room;
+        synchronized (rooms) {
+            for (var room : rooms)
+                if (room.isPlayerJoined(player))
+                    return room;
+        }
 
         return null;
     }
@@ -125,7 +131,10 @@ public class TelnetService extends Thread {
     // 1. Creates or finds a room where player is able to join
     // 2. Joins room
     public GameRoom getFreeRoom(RemotePlayer player) {
-        return null;
+        synchronized (rooms) {
+            // TODO: implement
+            return null;
+        }
     }
 
     public int getClientsCount() {
@@ -136,5 +145,10 @@ public class TelnetService extends Thread {
     // removes them from rooms and cleans up rooms
     // TODO: call this when update is expedient
     public void updateClients() {
+        synchronized (rooms){
+            synchronized (clients){
+                // TODO: implement
+            }
+        }
     }
 }
