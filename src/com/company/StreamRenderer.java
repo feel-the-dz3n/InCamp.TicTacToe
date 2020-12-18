@@ -36,7 +36,7 @@ public class StreamRenderer implements Renderer {
     public MenuEntry renderMenu(boolean isOnline) {
         while (true) {
             try {
-                out.print("==== TicTacToe ");
+                out.print("\r\n\r\n==== TicTacToe ");
                 if (isOnline) out.print("(online)");
                 else out.print("(host)");
 
