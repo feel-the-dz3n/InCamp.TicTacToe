@@ -41,7 +41,7 @@ public class InteractionService {
         while (true) {
             var menuEntry = render.renderMenu(gameService != null && gameService.isOnline());
 
-            if (menuEntry == MenuEntry.ONE_SCREEN_GAME) {
+            if (menuEntry == MenuEntry.LOCAL_GAME) {
                 runLocalGame();
             } else if (menuEntry == MenuEntry.START_SERVER) {
 

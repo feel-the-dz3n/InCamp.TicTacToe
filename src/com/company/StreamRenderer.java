@@ -2,7 +2,6 @@ package com.company;
 
 import java.io.*;
 import java.time.LocalTime;
-import java.util.Scanner;
 
 public class StreamRenderer implements Renderer {
     PrintStream out;
@@ -42,7 +41,7 @@ public class StreamRenderer implements Renderer {
 
                 switch (value) {
                     case 1:
-                        return MenuEntry.ONE_SCREEN_GAME;
+                        return MenuEntry.LOCAL_GAME;
                     case 2:
                         return isOnline ? MenuEntry.ROOM_GAME : MenuEntry.START_SERVER;
                     case 3:
