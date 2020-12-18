@@ -85,7 +85,7 @@ public class InteractionService extends Thread {
             var nick = render.askNickname();
             remotePlayer.setNickname(nick);
 
-            var room = telnetService.getFreeRoom();
+            var room = telnetService.getFreeRoom(remotePlayer);
 
         } catch (Exception ex) {
             render.drawMessage("Room game failed: " + ex.getMessage());

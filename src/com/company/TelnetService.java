@@ -7,11 +7,16 @@ import java.net.Socket;
 import java.time.LocalTime;
 import java.util.HashSet;
 
+// TODO:
+// - remove 'dead' players
+// - correctly process rooms where somebody left the game
+// - implement getFreeRoom
+
 public class TelnetService extends Thread {
     private ServerSocket serverSocket;
     private boolean stopping;
-    private HashSet<RemotePlayer> clients = new HashSet<>();
-    private HashSet<GameRoom> rooms = new HashSet<>();
+    HashSet<RemotePlayer> clients = new HashSet<>();
+    HashSet<GameRoom> rooms = new HashSet<>();
     private LocalTime startTime;
 
     public TelnetService() {
@@ -88,11 +93,29 @@ public class TelnetService extends Thread {
         return startTime;
     }
 
-    public GameRoom getFreeRoom() {
+    // Returns GameRoom if player joined any or
+    // returns null if player didn't join any room
+    public GameRoom getRemotePlayerRoom(RemotePlayer player) {
+        for (var room : rooms)
+            if (room.isPlayerJoined(player))
+                return room;
+
+        return null;
+    }
+
+    // 1. Creates or finds a room where player is able to join
+    // 2. Joins room
+    public GameRoom getFreeRoom(RemotePlayer player) {
         return null;
     }
 
     public int getClientsCount() {
         return clients.size();
+    }
+
+    // Checks if all players are still 'alive', otherwise
+    // removes them from rooms and cleans up rooms
+    // TODO: call this when update is expedient
+    public void updateClients() {
     }
 }

@@ -26,6 +26,10 @@ public class GameRoom {
         players.add(player);
     }
 
+    public boolean isPlayerJoined(RemotePlayer player) {
+        return players.contains(player);
+    }
+
     public void leaveRoom(RemotePlayer player) {
         players.remove(player);
 
