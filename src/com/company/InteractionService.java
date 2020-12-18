@@ -1,6 +1,6 @@
 package com.company;
 
-public class InteractionService extends Thread {
+public class InteractionService {
     private RemotePlayer remotePlayer;
     private Renderer render;
     public GameService gameService;

@@ -57,14 +57,33 @@ public class TelnetService extends Thread {
 
     private void processClients() {
         try {
+            // Wait for a new connection
             Socket client = serverSocket.accept();
-            var remotePlayer = new RemotePlayer(client);
-            clients.add(remotePlayer);
-            var svc = new InteractionService(
-                    new StreamRenderer(client.getInputStream(), new PrintStream(client.getOutputStream())),
-                    remotePlayer);
 
-            svc.start();
+            // We got one, now let's get in/out buffers
+            var inputStream= client.getInputStream();
+            var outStream = client.getOutputStream();
+
+            // Current thread will keep waiting for new connections
+            // Creating a new thread for interaction with client
+            Thread interactionThread = new Thread(() -> {
+                // Creating a new RemotePlayer instance
+                var remotePlayer = new RemotePlayer(client);
+                clients.add(remotePlayer);
+
+                // Creating InteractionService
+                var interaction = new InteractionService(
+                        new StreamRenderer(inputStream, new PrintStream(outStream)),
+                        remotePlayer);
+
+                // Start interaction!
+                interaction.run();
+
+                // Interaction finished, now cleanup
+                updateClients();
+            });
+
+            interactionThread.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
