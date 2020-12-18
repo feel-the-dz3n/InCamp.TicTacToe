@@ -5,9 +5,11 @@ import java.util.HashSet;
 public class GameRoom {
     private HashSet<RemotePlayer> players = new HashSet<>();
     private GameService gameService = new GameService();
+    private TelnetService telnetService;
 
-    public GameRoom() {
+    public GameRoom(TelnetService telnetService) {
         gameService.setRoom(this);
+        this.telnetService = telnetService;
     }
 
     public boolean isRoomEmpty() {
@@ -22,8 +24,29 @@ public class GameRoom {
         return players.size() < 2;
     }
 
+    public GameService getGameService() {
+        return gameService;
+    }
+
     public void joinRoom(RemotePlayer player) {
         players.add(player);
+
+        // Currently, the 1st player joined
+        // the room is X and the 2nd is O
+        if (players.size() == 1) player.setMark(Player.X);
+        else player.setMark(Player.O);
+
+        // Check if all joined
+        if (isRoomFull()) {
+            // all players joined, start the game
+            try {
+                gameService.startGame();
+            } catch (Exception e) {
+                // Game failed to start, destroy room
+                closeRoom();
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean isPlayerJoined(RemotePlayer player) {
@@ -52,5 +75,12 @@ public class GameRoom {
         }
 
         players.forEach((x) -> leaveRoom(x));
+    }
+
+    public RemotePlayer getPlayerByMark(Player mark) {
+        for (var p : players)
+            if (p.getMark() == mark)
+                return p;
+        return null;
     }
 }

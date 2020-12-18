@@ -87,13 +87,30 @@ public class GameService {
         this.room = room;
     }
 
+    public void waitForNextTurn() throws Exception {
+        if (!isGameStarted) throw new Exception("The game is not running.");
+
+        if (!isOnline()) throw new Exception("This game is not online session.");
+
+        var oldPlayer = getCurrentPlayer();
+        while (getGameStarted() && getCurrentPlayer() == oldPlayer)
+            Thread.sleep(500);
+    }
+
+    public TurnResult turn(int row, int column) throws Exception {
+        return turn(row, column, null);
+    }
+
     // Do a turn as current player.
     // In the case if any other turn can be done,
     // returns TurnResult.WaitingNextTurn and switches
     // between players. Otherwise, stops current game,
     // returns TurnResult.GameFinished. The winner is current player.
-    public TurnResult turn(int row, int column) throws Exception {
+    public TurnResult turn(int row, int column, RemotePlayer remotePlayer) throws Exception {
         if (!isGameStarted) throw new Exception("The game is not running.");
+
+        if (isOnline() && getCurrentPlayer() != remotePlayer.getMark())
+            throw new Exception("Not remotePlayer's turn");
 
         if (fieldService.isFieldOccupied(playField, row, column))
             throw new Exception("The field is already taken by one of players");

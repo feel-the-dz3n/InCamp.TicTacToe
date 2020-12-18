@@ -14,4 +14,5 @@ public interface Renderer {
     void drawGameFinished(PlayField playField, LocalTime startTime, LocalTime endTime, Player winner);
     ServerMenuEntry renderServerMenu(int roomsCount, int clientsCount, int port, LocalTime startTime);
     String askNickname();
+    boolean drawRoomWaiting(int clientsCount);
 }

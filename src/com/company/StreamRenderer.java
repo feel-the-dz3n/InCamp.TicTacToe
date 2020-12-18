@@ -196,4 +196,13 @@ public class StreamRenderer implements Renderer {
 
         return "(no name)";
     }
+
+    @Override
+    public boolean drawRoomWaiting(int clientsCount) {
+        drawMessage("\r\nWaiting for another player.");
+        drawMessage("Currently playing " + clientsCount + " players.");
+        drawMessage("Hit any key to go back...");
+
+        return true; // FIXME: allow to hit any key
+    }
 }

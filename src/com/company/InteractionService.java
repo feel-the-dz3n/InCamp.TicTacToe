@@ -87,6 +87,50 @@ public class InteractionService {
 
             var room = telnetService.getFreeRoom(remotePlayer);
 
+            while (!room.isRoomFull()) {
+                if (!render.drawRoomWaiting(telnetService.getClientsCount())) {
+                    // Player decides to leave the room
+                    room.leaveRoom(remotePlayer);
+                    telnetService.updateClients();
+                    break;
+                }
+
+                Thread.sleep(1000);
+            }
+
+            if (!room.isRoomFull()) return; // somebody left
+            else {
+                // Game began
+                this.gameService = room.getGameService();
+
+                while (gameService.getGameStarted()) {
+                    render.renderPlayField(gameService.getPlayField());
+
+                    if (gameService.getCurrentPlayer() == remotePlayer.getMark()) {
+                        // it's our turn
+                        var turn = render.askGameTurn(remotePlayer.getMark());
+                        try {
+                            gameService.turn(turn.getRow(), turn.getColumn());
+                        } catch (Exception ex) {
+                            render.drawMessage("Unable to do a turn: " + ex.getMessage());
+                        }
+                    } else {
+                        // waiting for opponent
+                        render.drawMessage(String.format(
+                                "Waiting for oponent %s '%s'",
+                                gameService.getCurrentPlayer(),
+                                room.getPlayerByMark(gameService.getCurrentPlayer()).getNickname()
+                                ));
+                    }
+                }
+
+                render.drawGameFinished(
+                        gameService.getPlayField(),
+                        gameService.getStartTime(),
+                        gameService.getStopTime(),
+                        gameService.getCurrentPlayer());
+            }
+
         } catch (Exception ex) {
             render.drawMessage("Room game failed: " + ex.getMessage());
         }
