@@ -3,7 +3,6 @@ package com.company;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.time.Period;
 import java.util.Locale;
 
 public class StreamRenderer implements Renderer {
@@ -12,7 +11,6 @@ public class StreamRenderer implements Renderer {
     InputStreamReader inputStreamReader;
     InputStream inputStream;
     PlayFieldService fieldSvc = new PlayFieldService();
-    TextRenderService textSvc = new TextRenderService();
 
     public StreamRenderer(InputStream in, PrintStream out) {
         this.inputStream = in;
@@ -38,7 +36,21 @@ public class StreamRenderer implements Renderer {
     public MenuEntry renderMenu(boolean isOnline) {
         while (true) {
             try {
-                out.print(textSvc.getMainMenu(isOnline));
+                out.print("==== TicTacToe ");
+                if (isOnline) out.print("(online)");
+                else out.print("(host)");
+
+                out.print("\r\n\r\n");
+
+                out.print("Main Menu\r\n");
+                out.print("1) Two Players, One Screen\r\n");
+                out.print("2) ");
+
+                if (isOnline) out.print("Join/Create a Room");
+                else out.print("Start Server");
+
+                out.print("\r\n3) Quit\r\n\r\nYour choice: ");
+
                 var line = in.readLine();
                 int value = Integer.parseInt(line);
 
@@ -58,14 +70,41 @@ public class StreamRenderer implements Renderer {
         }
     }
 
+    private void visualizeRow(PlayField fields, int row) {
+        out.print("|");
+
+        for (int i = 0; i < fields.fieldSize; i++) {
+            out.print(" " + fieldSvc.getFieldTextValue(fields, row, i) + " ");
+            out.print("|");
+        }
+
+        out.println();
+    }
+
+    public void visualizeFieldSeparator(PlayField field) {
+        out.print("+");
+        for (int i = 0; i < field.fieldSize; i++) {
+            for (int j = 0; j < 3; j++)
+                out.print("-");
+            out.print("+");
+        }
+        out.println();
+    }
+
     @Override
     public void renderPlayField(PlayField playField) {
-        out.println("\r\n" + textSvc.getPlayField(playField));
+        visualizeFieldSeparator(playField);
+        for (int row = 0; row < playField.fieldSize; row++) {
+            visualizeRow(playField, row);
+            visualizeFieldSeparator(playField);
+        }
+
+        out.println("\r\n");
     }
 
     @Override
     public TurnInformation askGameTurn(Player currentPlayer) {
-        drawMessage(textSvc.getTurnText(currentPlayer));
+        drawMessage("Player " + currentPlayer + ", type ROW COLUMN to make a turn: ");
 
         String line = null;
         try {
