@@ -12,4 +12,6 @@ public interface Renderer {
     void drawMessage(String text);
     int askPlayFieldSize();
     void drawGameFinished(PlayField playField, LocalTime startTime, LocalTime endTime, Player winner);
+    ServerMenuEntry renderServerMenu(int roomsCount, int clientsCount, int port, LocalTime startTime);
+    String askNickname();
 }

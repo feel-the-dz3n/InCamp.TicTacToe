@@ -1,7 +1,10 @@
 package com.company;
 
 import java.io.*;
+import java.time.Duration;
 import java.time.LocalTime;
+import java.time.Period;
+import java.util.Locale;
 
 public class StreamRenderer implements Renderer {
     PrintStream out;
@@ -84,6 +87,7 @@ public class StreamRenderer implements Renderer {
 
     @Override
     public int askPlayFieldSize() {
+        // FIXME: use TextRenderService
         drawMessage("\r\nEnter playfield size (or leave empty for 3): ");
 
         String line = null;
@@ -104,5 +108,48 @@ public class StreamRenderer implements Renderer {
         // TODO: show more information
         renderPlayField(playField);
         drawMessage("\r\nGame finished, winner: " + winner);
+    }
+
+    @Override
+    public ServerMenuEntry renderServerMenu(int roomsCount, int clientsCount, int port, LocalTime startTime) {
+        // FIXME: use TextRenderService
+        drawMessage("\r\n\r\nThe server is running.");
+        drawMessage("Rooms Count: " + roomsCount);
+        drawMessage("Clients Count: " + clientsCount);
+        drawMessage("Port: " + port);
+
+        if (startTime != null) {
+            var duration = Duration.between(startTime, LocalTime.now());
+            var s = duration.getSeconds();
+            drawMessage(String.format("Uptime: %d:%02d:%02d", s / 3600, (s % 3600) / 60, (s % 60)));
+        }
+
+        drawMessage("\r\nPut 'stop' into buffer to stop the server.");
+
+        String line = null;
+        try {
+            line = in.readLine();
+            if (line.toLowerCase(Locale.ROOT).startsWith("stop")) return ServerMenuEntry.STOP_SERVER;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    public String askNickname() {
+        drawMessage("\r\nEnter your nickname (or leave empty):");
+
+        String line = null;
+        try {
+            line = in.readLine();
+            if (line.isEmpty()) return "(no name)";
+            else return line;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "(no name)";
     }
 }

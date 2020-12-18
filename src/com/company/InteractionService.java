@@ -1,14 +1,22 @@
 package com.company;
 
-public class InteractionService {
+public class InteractionService extends Thread {
+    private RemotePlayer remotePlayer;
     private Renderer render;
     public GameService gameService;
 
+    // Local player renderer
     public InteractionService(Renderer renderer) {
         this.render = renderer;
     }
 
-    public void runLocalGame() {
+    // Remote player renderer
+    public InteractionService(Renderer renderer, RemotePlayer player) {
+        this(renderer);
+        this.remotePlayer = player;
+    }
+
+    private void runLocalGame() {
         int playfieldSize = render.askPlayFieldSize();
         gameService = new GameService();
         try {
@@ -39,14 +47,14 @@ public class InteractionService {
         render.initialize();
 
         while (true) {
-            var menuEntry = render.renderMenu(gameService != null && gameService.isOnline());
+            var menuEntry = render.renderMenu(isOnline());
 
             if (menuEntry == MenuEntry.LOCAL_GAME) {
                 runLocalGame();
             } else if (menuEntry == MenuEntry.START_SERVER) {
-
+                runServer();
             } else if (menuEntry == MenuEntry.ROOM_GAME) {
-
+                runRoomGame();
             } else if (menuEntry == MenuEntry.QUIT) {
                 break;
             }
@@ -61,5 +69,49 @@ public class InteractionService {
         }
 
         render.shutdown();
+    }
+
+    public boolean isOnline() {
+        return remotePlayer != null;
+    }
+
+    private void runRoomGame() {
+        try {
+            var telnetService = new TelnetService();
+            var nick = render.askNickname();
+            remotePlayer.setNickname(nick);
+
+            var room = telnetService.getFreeRoom();
+
+        } catch (Exception ex) {
+            render.drawMessage("Room game failed: " + ex.getMessage());
+        }
+    }
+
+    private void runServer() {
+        try {
+            var telnetSvc = new TelnetService(4000);
+            telnetSvc.start();
+
+            Thread.sleep(500); // wait a lil' for starting a thread
+
+            while (telnetSvc.isAlive()) {
+                var menuEntry = render.renderServerMenu(
+                        telnetSvc.getRoomsCount(),
+                        telnetSvc.getClientsCount(),
+                        telnetSvc.getPort(),
+                        telnetSvc.getStartTime()
+                );
+
+                if (menuEntry == ServerMenuEntry.STOP_SERVER) {
+                    telnetSvc.stopServer();
+                    render.drawMessage("Please wait, stopping the server...");
+                    telnetSvc.join();
+                }
+            }
+        } catch (Exception e) {
+            render.drawMessage("Server Error: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

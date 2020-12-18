@@ -83,6 +83,10 @@ public class GameService {
         return room;
     }
 
+    public void setRoom(GameRoom room) {
+        this.room = room;
+    }
+
     // Do a turn as current player.
     // In the case if any other turn can be done,
     // returns TurnResult.WaitingNextTurn and switches
