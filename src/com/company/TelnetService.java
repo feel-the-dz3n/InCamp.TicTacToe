@@ -7,11 +7,6 @@ import java.net.Socket;
 import java.time.LocalTime;
 import java.util.HashSet;
 
-// TODO:
-// - remove 'dead' players
-// - correctly process rooms where somebody left the game
-// - implement getFreeRoom
-
 public class TelnetService extends Thread {
     private ServerSocket serverSocket;
     private boolean stopping;
