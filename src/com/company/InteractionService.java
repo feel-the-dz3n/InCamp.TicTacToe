@@ -30,7 +30,11 @@ public class InteractionService extends Thread {
 
             try {
                 TurnInformation field = render.askGameTurn(gameService.getCurrentPlayer());
-                gameService.turn(field.getRow(), field.getColumn());
+                if (!field.isLeavingGame()) {
+                    gameService.turn(field.getRow(), field.getColumn());
+                } else {
+                    gameService.stopGame();
+                }
             } catch (Exception ex) {
                 render.drawMessage("Unable to do a turn: " + ex.getMessage());
             }

@@ -104,7 +104,8 @@ public class StreamRenderer implements Renderer {
 
     @Override
     public TurnInformation askGameTurn(Player currentPlayer) {
-        drawMessage("Player " + currentPlayer + ", type ROW COLUMN to make a turn: ");
+        drawMessage("Current Player: " + currentPlayer);
+        drawMessage("Write 'ROW COLUMN' to make a turn or 'q' to leave");
 
         String line = null;
         try {
@@ -112,6 +113,10 @@ public class StreamRenderer implements Renderer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        if (line.toLowerCase(Locale.ROOT).startsWith("q"))
+            return new TurnInformation(true);
+
         String[] numsRaw = line.split(" ");
         int row = Integer.parseInt(numsRaw[0]);
         int column = Integer.parseInt(numsRaw[1]);
