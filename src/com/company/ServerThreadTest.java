@@ -12,8 +12,8 @@ class ServerThreadTest {
 
         // Creating fake players
         RemotePlayer
-                player1 = new RemotePlayer(null),
-                player2 = new RemotePlayer(null),
+                player1 = new RemotePlayer(null), // FIXME: null-socket will result fail
+                player2 = new RemotePlayer(null), 
                 player3 = new RemotePlayer(null),
                 player4 = new RemotePlayer(null);
 
