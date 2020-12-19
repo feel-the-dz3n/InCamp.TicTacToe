@@ -10,11 +10,11 @@ import java.time.LocalTime;
 import java.util.HashSet;
 
 public class TelnetService extends Thread {
-    private Logger log;
+    private final Logger log;
     private ServerSocket serverSocket;
     private boolean stopping;
-    HashSet<RemotePlayer> clients = new HashSet<>();
-    HashSet<GameRoom> rooms = new HashSet<>();
+    final HashSet<RemotePlayer> clients = new HashSet<>();
+    final HashSet<GameRoom> rooms = new HashSet<>();
     private LocalTime startTime;
 
     public TelnetService() {
@@ -42,9 +42,7 @@ public class TelnetService extends Thread {
         log.log(Level.TRACE, "Shutting down the server");
 
         // Close all rooms
-        rooms.forEach((room) -> {
-            room.closeRoom();
-        });
+        rooms.forEach(GameRoom::closeRoom);
 
         // Close all connections
         clients.forEach((r) -> {
@@ -164,14 +162,14 @@ public class TelnetService extends Thread {
 
     private void updateClients() {
         synchronized (clients) {
-            clients.forEach((x) -> updateClient(x));
+            clients.forEach(this::updateClient);
         }
     }
 
 
     private void updateRooms() {
         synchronized (rooms) {
-            rooms.forEach((x) -> updateRoom(x));
+            rooms.forEach(this::updateRoom);
         }
     }
 
@@ -197,8 +195,6 @@ public class TelnetService extends Thread {
 
             room.closeRoom();
             rooms.remove(room);
-
-            return;
         }
     }
 }
