@@ -45,7 +45,7 @@ class TelnetServiceTest {
 
         // Now let's imagine that player 2 which was in room1/2 left the game
         svc.clients.remove(player2);
-        svc.updateClients();
+        svc.update();
 
         // Player 1 is supposed to be removed from the 'room1/2'
         // 'room1/2' is supposed to be removed from TelnetService at all
@@ -60,7 +60,7 @@ class TelnetServiceTest {
 
         // OK, now let's imagine that player 4 lost the connection.
         svc.clients.remove(player4);
-        svc.updateClients();
+        svc.update();
 
         // So, there are no more rooms on the server
         assertEquals(0, svc.getRoomsCount());

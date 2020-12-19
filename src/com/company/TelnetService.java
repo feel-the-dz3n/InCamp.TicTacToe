@@ -79,7 +79,7 @@ public class TelnetService extends Thread {
                 interaction.run();
 
                 // Interaction finished, now cleanup
-                updateClients();
+                update();
             });
 
             interactionThread.start();
@@ -139,11 +139,28 @@ public class TelnetService extends Thread {
     // Checks if all players are still 'alive', otherwise
     // removes them from rooms and cleans up rooms
     // TODO: call this when update is expedient
-    public void updateClients() {
-        synchronized (rooms){
-            synchronized (clients){
-                // TODO: implement
-            }
+    public void update() {
+        updateClients();
+        updateRooms();
+    }
+
+    private void updateClients() {
+        synchronized (clients) {
+            clients.forEach((x) -> updateClient(x));
         }
+    }
+
+
+    private void updateRooms() {
+        synchronized (rooms) {
+            rooms.forEach((x) -> updateRoom(x));
+        }
+    }
+
+    private void updateRoom(GameRoom room) {
+    }
+
+    private void updateClient(RemotePlayer player) {
+
     }
 }

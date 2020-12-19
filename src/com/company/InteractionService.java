@@ -91,7 +91,7 @@ public class InteractionService {
                 if (!render.drawRoomWaiting(telnetService.getClientsCount())) {
                     // Player decides to leave the room
                     room.leaveRoom(remotePlayer);
-                    telnetService.updateClients();
+                    telnetService.update();
                     break;
                 }
 
