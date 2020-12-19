@@ -81,7 +81,7 @@ public class InteractionService {
 
     private void runRoomGame() {
         try {
-            var telnetService = new TelnetService();
+            var telnetService = new ServerThread();
             var nick = render.askNickname();
             remotePlayer.setNickname(nick);
 
@@ -138,7 +138,7 @@ public class InteractionService {
 
     private void runServer() {
         try {
-            var telnetSvc = new TelnetService(4000);
+            var telnetSvc = new ServerThread(4000);
             telnetSvc.start();
 
             Thread.sleep(500); // wait a lil' for starting a thread

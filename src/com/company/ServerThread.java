@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.time.LocalTime;
 import java.util.HashSet;
 
-public class TelnetService extends Thread {
+public class ServerThread extends Thread {
     private final Logger log;
     private ServerSocket serverSocket;
     private boolean stopping;
@@ -17,11 +17,11 @@ public class TelnetService extends Thread {
     final HashSet<GameRoom> rooms = new HashSet<>();
     private LocalTime startTime;
 
-    public TelnetService() {
+    public ServerThread() {
         log = System.getLogger("Server");
     }
 
-    public TelnetService(int port) throws IOException {
+    public ServerThread(int port) throws IOException {
         this();
         serverSocket = new ServerSocket(port);
     }

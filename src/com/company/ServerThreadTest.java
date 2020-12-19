@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TelnetServiceTest {
+class ServerThreadTest {
 
     @Test
     void getFreeeRoom__updateClients__tests() {
-        var svc = new TelnetService();
+        var svc = new ServerThread();
 
         // Creating fake players
         RemotePlayer

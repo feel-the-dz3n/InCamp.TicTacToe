@@ -5,11 +5,11 @@ import java.util.HashSet;
 public class GameRoom {
     private HashSet<RemotePlayer> players = new HashSet<>();
     private GameService gameService = new GameService();
-    private TelnetService telnetService;
+    private ServerThread serverThread;
 
-    public GameRoom(TelnetService telnetService) {
+    public GameRoom(ServerThread serverThread) {
         gameService.setRoom(this);
-        this.telnetService = telnetService;
+        this.serverThread = serverThread;
     }
 
     public boolean isRoomEmpty() {
