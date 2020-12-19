@@ -120,7 +120,7 @@ public class InteractionService {
                                 "Waiting for oponent %s '%s'",
                                 gameService.getCurrentPlayer(),
                                 room.getPlayerByMark(gameService.getCurrentPlayer()).getNickname()
-                                ));
+                        ));
                     }
                 }
 

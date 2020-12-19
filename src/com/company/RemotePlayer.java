@@ -30,4 +30,8 @@ public class RemotePlayer {
     public Player getMark() {
         return mark;
     }
+
+    public boolean isAlive() {
+        return socket != null && socket.isConnected() && !socket.isClosed();
+    }
 }

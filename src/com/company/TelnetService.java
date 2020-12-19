@@ -2,12 +2,15 @@ package com.company;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalTime;
 import java.util.HashSet;
 
 public class TelnetService extends Thread {
+    private Logger log;
     private ServerSocket serverSocket;
     private boolean stopping;
     HashSet<RemotePlayer> clients = new HashSet<>();
@@ -15,15 +18,18 @@ public class TelnetService extends Thread {
     private LocalTime startTime;
 
     public TelnetService() {
-
+        log = System.getLogger("Server");
     }
 
     public TelnetService(int port) throws IOException {
+        this();
         serverSocket = new ServerSocket(port);
     }
 
     public void run() {
         startTime = LocalTime.now();
+
+        log.log(Level.TRACE, "Starting server on port " + serverSocket.getLocalPort());
 
         while (!stopping) {
             processClients();
@@ -33,27 +39,33 @@ public class TelnetService extends Thread {
     }
 
     private void shutdownServer() {
-        // Close and remove each room
+        log.log(Level.TRACE, "Shutting down the server");
+
+        // Close all rooms
         rooms.forEach((room) -> {
             room.closeRoom();
-            rooms.remove(room);
         });
 
-        // Close all connections and remove all players
+        // Close all connections
         clients.forEach((r) -> {
             try {
                 r.getSocket().close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            clients.remove(r);
         });
+
+        update();
+
+        log.log(Level.TRACE, "Shutdown completed");
     }
 
     private void processClients() {
         try {
             // Wait for a new connection
             Socket client = serverSocket.accept();
+
+            log.log(Level.INFO, "Got a new connection from " + client.getLocalAddress());
 
             // We got one, now let's get in/out buffers
             var inputStream = client.getInputStream();
@@ -79,6 +91,12 @@ public class TelnetService extends Thread {
                 interaction.run();
 
                 // Interaction finished, now cleanup
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
                 update();
             });
 
@@ -157,10 +175,30 @@ public class TelnetService extends Thread {
         }
     }
 
-    private void updateRoom(GameRoom room) {
+    private void updateClient(RemotePlayer player) {
+        if (!player.isAlive()) {
+            log.log(Level.INFO, "Got a dead client, cleaning up");
+
+            var room = getRemotePlayerRoom(player);
+            if (room != null) {
+                log.log(Level.INFO, "Previous dead client was in a room");
+                room.leaveRoom(player);
+            }
+
+            clients.remove(player);
+        }
     }
 
-    private void updateClient(RemotePlayer player) {
+    private void updateRoom(GameRoom room) {
+        var gameService = room.getGameService();
 
+        if (gameService.getGameStarted() && !room.isRoomFull()) {
+            log.log(Level.INFO, "Got an incomplete room, cleaning up");
+
+            room.closeRoom();
+            rooms.remove(room);
+
+            return;
+        }
     }
 }
