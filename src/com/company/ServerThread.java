@@ -76,19 +76,19 @@ public class ServerThread extends Thread {
                 // Creating a new RemotePlayer instance
                 var remotePlayer = new RemotePlayer(client);
 
-                synchronized (clients) {
-                    clients.add(remotePlayer);
-                }
+                clients.add(remotePlayer);
 
                 // Creating InteractionService
                 var interaction = new InteractionService(
                         new StreamRenderer(inputStream, new PrintStream(outStream)),
-                        remotePlayer);
+                        remotePlayer,
+                        this);
 
                 // Start interaction!
                 interaction.run();
 
                 // Interaction finished, now cleanup
+                log.log(Level.INFO, "Connection finished");
                 try {
                     client.close();
                 } catch (IOException e) {
@@ -143,8 +143,26 @@ public class ServerThread extends Thread {
     // 2. Joins room
     public GameRoom getFreeRoom(RemotePlayer player) {
         synchronized (rooms) {
-            // TODO: implement
-            return null;
+            GameRoom playerRoom;
+
+            for (var room : rooms) {
+                if (room.canJoinRoom()) {
+                    log.log(Level.INFO, "Found a room for player " + player.getNickname());
+
+                    room.joinRoom(player);
+                    return room;
+                }
+            }
+
+            // We have not found room, so create a new one
+            log.log(Level.INFO, "Creating a room for player " + player.getNickname());
+
+            playerRoom = new GameRoom(this);
+            rooms.add(playerRoom);
+
+            playerRoom.joinRoom(player);
+
+            return playerRoom;
         }
     }
 
@@ -154,7 +172,7 @@ public class ServerThread extends Thread {
 
     // Checks if all players are still 'alive', otherwise
     // removes them from rooms and cleans up rooms
-    // TODO: call this when update is expedient
+    // remark: call this when update is expedient
     public void update() {
         updateClients();
         updateRooms();
@@ -162,14 +180,20 @@ public class ServerThread extends Thread {
 
     private void updateClients() {
         synchronized (clients) {
-            clients.forEach(this::updateClient);
+            try {
+                clients.forEach(this::updateClient);
+            } catch (Exception e) {
+            }
         }
     }
 
 
     private void updateRooms() {
         synchronized (rooms) {
-            rooms.forEach(this::updateRoom);
+            try {
+                rooms.forEach(this::updateRoom);
+            } catch (Exception e) {
+            }
         }
     }
 
@@ -196,5 +220,9 @@ public class ServerThread extends Thread {
             room.closeRoom();
             rooms.remove(room);
         }
+    }
+
+    public boolean isRoomAvailable(GameRoom room) {
+        return rooms.contains(room);
     }
 }

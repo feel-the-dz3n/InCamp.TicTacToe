@@ -4,6 +4,7 @@ public class InteractionService {
     private RemotePlayer remotePlayer;
     private Renderer render;
     public GameService gameService;
+    private ServerThread server;
 
     // Local player renderer
     public InteractionService(Renderer renderer) {
@@ -11,9 +12,10 @@ public class InteractionService {
     }
 
     // Remote player renderer
-    public InteractionService(Renderer renderer, RemotePlayer player) {
+    public InteractionService(Renderer renderer, RemotePlayer player, ServerThread server) {
         this(renderer);
         this.remotePlayer = player;
+        this.server = server;
     }
 
     private void runLocalGame() {
@@ -81,17 +83,17 @@ public class InteractionService {
 
     private void runRoomGame() {
         try {
-            var telnetService = new ServerThread();
             var nick = render.askNickname();
             remotePlayer.setNickname(nick);
 
-            var room = telnetService.getFreeRoom(remotePlayer);
+            var room = server.getFreeRoom(remotePlayer);
 
-            while (!room.isRoomFull()) {
-                if (!render.drawRoomWaiting(telnetService.getClientsCount())) {
+            while (server.isRoomAvailable(room) &&
+                    !room.isRoomFull()) {
+                if (!render.drawRoomWaiting(server.getClientsCount())) {
                     // Player decides to leave the room
                     room.leaveRoom(remotePlayer);
-                    telnetService.update();
+                    server.update();
                     break;
                 }
 
@@ -108,9 +110,9 @@ public class InteractionService {
 
                     if (gameService.getCurrentPlayer() == remotePlayer.getMark()) {
                         // it's our turn
-                        var turn = render.askGameTurn(remotePlayer.getMark());
                         try {
-                            gameService.turn(turn.getRow(), turn.getColumn());
+                            var turn = render.askGameTurn(remotePlayer.getMark());
+                            gameService.turn(turn.getRow(), turn.getColumn(), remotePlayer);
                         } catch (Exception ex) {
                             render.drawMessage("Unable to do a turn: " + ex.getMessage());
                         }
@@ -121,6 +123,8 @@ public class InteractionService {
                                 gameService.getCurrentPlayer(),
                                 room.getPlayerByMark(gameService.getCurrentPlayer()).getNickname()
                         ));
+
+                        gameService.waitForNextTurn();
                     }
                 }
 
